@@ -1,0 +1,48 @@
+
+name: Lint
+on:
+  push:
+    paths:
+      - "**.go"
+      - go.mod
+      - go.sum
+  pull_request:
+    paths:
+      - "**.go"
+      - go.mod
+      - go.sum
+      
+jobs:
+  lint:
+    strategy:
+      matrix:
+        platform: [ubuntu-16.04, ubuntu-18.04]
+        go-version: [1.13.x, 1.14.x]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go version
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+          
+      - name: Check out code
+        uses: actions/checkout@v2
+        
+      - name: Verify go module dependencies
+        run: |
+          go mod verify
+          go mod download
+          
+      - name: Run checks
+        run: |
+          STATUS=0
+          checking() {
+            local diff
+            if ! diff="$(git diff -U1 --color --exit-code)"; then
+              printf '\e[31mError: running `\e[1m%s\e[22m` results in modifications that you must check it again:\e[0m\n%s\n\n' "$*" "$diff" >&2
+              git checkout -- .
+              STATUS=1
+            fi
+          }
+          checking go fmt ./...
+          exit $STATUS
