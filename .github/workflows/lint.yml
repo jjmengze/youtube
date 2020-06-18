@@ -38,6 +38,7 @@ jobs:
           STATUS=0
           checking() {
             local diff
+            "$@" >/dev/null 
             if ! diff="$(git diff -U1 --color --exit-code)"; then
               printf '\e[31mError: running `\e[1m%s\e[22m` results in modifications that you must check it again:\e[0m\n%s\n\n' "$*" "$diff" >&2
               git checkout -- .
