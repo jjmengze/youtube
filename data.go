@@ -1,6 +1,14 @@
 package youtube
 
 type PlayerResponseData struct {
+
+
+
+
+
+
+
+
            	PlayabilityStatus struct {
 		Status          string `json:"status"`
 		Reason          string `json:"reason"`
